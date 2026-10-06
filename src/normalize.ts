@@ -397,7 +397,10 @@ export const normalize: Normalizer = async (
           '$1-$3',
         )
         .replace(/([0-9]+|[〇一二三四五六七八九十百千]+)番(地|$)/, '$1')
-        .replace(/([0-9]+|[〇一二三四五六七八九十百千]+)の/g, '$1-')
+        .replace(
+          /([0-9]+|[〇一二三四五六七八九十百千]+)の(?=[0-9０-９〇一二三四五六七八九十百千])/g,
+          '$1-',
+        )
         .replace(
           /([0-9]+|[〇一二三四五六七八九十百千]+)[-－﹣−‐⁃‑‒–—﹘―⎯⏤ーｰ─━]/g,
           (match) => {
@@ -418,10 +421,17 @@ export const normalize: Normalizer = async (
           // `-1` のようなケース
           return kan2num(s)
         })
-        .replace(/-[^0-9]([0-9]+|[〇一二三四五六七八九十百千]+)/, (s) => {
+        .replace(/-[^0-9]([0-9]+)/, (s) => {
           // `-あ1` のようなケース
           return kan2num(zen2han(s))
         })
+        .replace(
+          /-[^0-9\p{Script=Hiragana}\p{Script=Katakana}]([〇一二三四五六七八九十百千]+)/u,
+          (s) => {
+            // `-Ａ二二` のようなケース（かなを挟む `-ル千` のような建物名は変換しない）
+            return kan2num(zen2han(s))
+          },
+        )
         .replace(/([0-9]+|[〇一二三四五六七八九十百千]+)$/, (s) => {
           // `串本町串本１２３４` のようなケース
           return kan2num(s)

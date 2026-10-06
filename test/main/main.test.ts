@@ -140,6 +140,22 @@ describe(`basic tests`, () => {
     })
   })
 
+  describe('建物名など番地以外の漢数字は変換しない', () => {
+    test('東京都港区芝公園1丁目 シエ-ル千島306', async () => {
+      const res = await normalize('東京都港区芝公園一丁目 シエ-ル千島306')
+      assertMatchCloseTo(res, {
+        other: 'シエ-ル千島306',
+      })
+    })
+
+    test('東京都千代田区丸の内1-1 一の宮ビル', async () => {
+      const res = await normalize('東京都千代田区丸の内1-1 一の宮ビル')
+      assertMatchCloseTo(res, {
+        other: '1 一の宮ビル',
+      })
+    })
+  })
+
   test('東京都江東区豊洲 四-2-27', async () => {
     const res = await normalize('東京都江東区豊洲 四-2-27')
     assertMatchCloseTo(res, {
